@@ -1,0 +1,3 @@
+#锁自定义starter的自动化配置
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+vip.wangjc.lock.auto.configure.LockAutoConfiguration
