@@ -2,6 +2,8 @@ package vip.wangjc.lock.aop;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vip.wangjc.lock.LockTemplate;
 import vip.wangjc.lock.annotation.LockSingle;
 import vip.wangjc.lock.entity.LockEntity;
@@ -15,6 +17,7 @@ import vip.wangjc.lock.entity.LockEntity;
  */
 public class LockSingleInterceptor implements MethodInterceptor {
 
+    private static final Logger logger = LoggerFactory.getLogger(LockSingleInterceptor.class);
     private final LockTemplate lockTemplate;
 
     public LockSingleInterceptor(LockTemplate lockTemplate){
@@ -32,6 +35,9 @@ public class LockSingleInterceptor implements MethodInterceptor {
                 return invocation.proceed();
             }
             return null;
+        }catch (Exception e){
+            logger.error("LockSingleInterceptor invoke error reason[{}]",e.getMessage());
+            throw e;
         }finally {
             lockTemplate.releaseLockSingle(lockEntity,lockSingle);
         }

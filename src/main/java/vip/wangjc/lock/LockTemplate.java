@@ -3,12 +3,14 @@ package vip.wangjc.lock;
 import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import vip.wangjc.lock.annotation.LockCloud;
 import vip.wangjc.lock.annotation.LockSingle;
 import vip.wangjc.lock.entity.LockCloudEntity;
 import vip.wangjc.lock.entity.LockEntity;
-import vip.wangjc.lock.executor.LockExecutorFactory;
+import vip.wangjc.lock.executor.LockCloudExecutorFactory;
+import vip.wangjc.lock.executor.LockSingleExecutorFactory;
 import vip.wangjc.lock.executor.service.ILockExecutorService;
 import vip.wangjc.lock.util.LockUtil;
 
@@ -27,11 +29,10 @@ public class LockTemplate {
     private static final String PROCESS_ID = LockUtil.getLocalMac() + LockUtil.getJVMProcessId();
 
     /** 锁的执行器构建工厂 */
-    private final LockExecutorFactory lockExecutorFactory;
-
-    public LockTemplate(LockExecutorFactory lockExecutorFactory){
-        this.lockExecutorFactory = lockExecutorFactory;
-    }
+    @Autowired(required = false)
+    private LockSingleExecutorFactory lockSingleExecutorFactory;
+    @Autowired(required = false)
+    private LockCloudExecutorFactory lockCloudExecutorFactory;
 
     /**
      * 加锁，普通锁
@@ -50,7 +51,7 @@ public class LockTemplate {
         String value = PROCESS_ID + Thread.currentThread().getName();
 
         /** 当前锁的核心处理器 */
-        ILockExecutorService lockExecutorService = this.lockExecutorFactory.buildSingleExecutor(lock);
+        ILockExecutorService lockExecutorService = this.lockSingleExecutorFactory.buildSingleExecutor(lock);
 
         /** 尝试获取锁 */
         boolean result = lockExecutorService.acquire(key,value,lock.acquireTimeout(),null);
@@ -94,7 +95,7 @@ public class LockTemplate {
         String value = PROCESS_ID + Thread.currentThread().getName();
 
         /** 当前锁的核心处理器 */
-        ILockExecutorService lockExecutorService = this.lockExecutorFactory.buildCloudExecutor(lock);
+        ILockExecutorService lockExecutorService = this.lockCloudExecutorFactory.buildCloudExecutor(lock);
 
         /** 重试次数，自加 */
         int acquireCount = 0;

@@ -2,6 +2,8 @@ package vip.wangjc.lock.aop;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vip.wangjc.lock.LockTemplate;
 import vip.wangjc.lock.annotation.LockCloud;
 import vip.wangjc.lock.entity.LockCloudEntity;
@@ -15,6 +17,7 @@ import vip.wangjc.lock.entity.LockCloudEntity;
  */
 public class LockCloudInterceptor implements MethodInterceptor {
 
+    private static final Logger logger = LoggerFactory.getLogger(LockCloudInterceptor.class);
     private final LockTemplate lockTemplate;
 
     public LockCloudInterceptor(LockTemplate lockTemplate){
@@ -33,6 +36,9 @@ public class LockCloudInterceptor implements MethodInterceptor {
                 return invocation.proceed();
             }
             return null;
+        }catch (Exception e){
+            logger.error("LockCloudInterceptor invoke error, reason[{}]",e.getMessage());
+            throw e;
         }finally {
             lockTemplate.releaseLockCloud(lockCloudEntity,lockCloud);
         }

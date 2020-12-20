@@ -20,7 +20,7 @@ public interface ILockFailureStrategyService {
 
     /**
      * 释放锁的失败策略
-     * @param lockEntity
+     * @param lockEntity：锁的对应实体
      */
     void releaseFailure(LockEntity lockEntity);
 }
