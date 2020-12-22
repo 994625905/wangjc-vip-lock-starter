@@ -2,6 +2,7 @@ package vip.wangjc.lock.auto.configure;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -26,11 +27,12 @@ import vip.wangjc.lock.executor.LockSingleExecutorFactory;
  * @date 2020/12/13 - 16:26
  */
 @Configuration
+@Order(99)
 public class LockAutoConfiguration {
 
     /**
-     * @ConditionalOnMissingBean注解 备用选项，如果当前容器中已经存在该项bean，则不注入备用选项，如果不存在就注入
-     * @ConditionalOnClass注解 某个class位于类路径上，才会实例化一个Bean
+     * @ConditionalOnMissingBean注解 如果当前容器中已经存在该bean，则不注入，如果不存在就注入
+     * @ConditionalOnClass注解 某个class位于类路径上，才会实例化一个Bean，声明类
      */
 
     /**
@@ -38,7 +40,6 @@ public class LockAutoConfiguration {
      * @return
      */
     @Bean
-    @ConditionalOnMissingBean
     public LockSingleExecutorFactory lockSingleExecutorFactory(){
         return new LockSingleExecutorFactory();
     }
@@ -56,7 +57,6 @@ public class LockAutoConfiguration {
          * @return
          */
         @Bean
-        @Order(99)
         public LockCloudExecutorFactory lockCloudExecutorFactory(RedisTemplate redisTemplate, RedissonClient redissonClient){
             return new LockCloudExecutorFactory(redisTemplate,redissonClient);
         }
@@ -67,8 +67,6 @@ public class LockAutoConfiguration {
      * @return
      */
     @Bean
-    @Order(199)
-    @ConditionalOnMissingBean
     public LockTemplate lockTemplate(){
         return new LockTemplate();
     }
@@ -79,7 +77,7 @@ public class LockAutoConfiguration {
      * @return
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnBean(LockTemplate.class)
     public LockSingleInterceptor lockSingleInterceptor(LockTemplate lockTemplate){
         return new LockSingleInterceptor(lockTemplate);
     }
@@ -90,7 +88,7 @@ public class LockAutoConfiguration {
      * @return
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnBean(LockTemplate.class)
     public LockCloudInterceptor lockCloudInterceptor(LockTemplate lockTemplate){
         return new LockCloudInterceptor(lockTemplate);
     }
@@ -101,7 +99,7 @@ public class LockAutoConfiguration {
      * @return
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnBean(LockSingleInterceptor.class)
     public LockSingleAnnotationAdvisor lockSingleAnnotationAdvisor(LockSingleInterceptor lockSingleInterceptor){
         return new LockSingleAnnotationAdvisor(lockSingleInterceptor, Ordered.HIGHEST_PRECEDENCE);
     }
@@ -112,7 +110,7 @@ public class LockAutoConfiguration {
      * @return
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnBean(LockCloudInterceptor.class)
     public LockCloudAnnotationAdvisor lockCloudAnnotationAdvisor(LockCloudInterceptor lockCloudInterceptor){
         return new LockCloudAnnotationAdvisor(lockCloudInterceptor,Ordered.HIGHEST_PRECEDENCE+1);
     }

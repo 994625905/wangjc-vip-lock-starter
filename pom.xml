@@ -13,7 +13,7 @@
 
     <groupId>vip.wangjc</groupId>
     <artifactId>wangjc-vip-lock-starter</artifactId>
-    <version>1.0.2</version>
+    <version>1.1.0</version>
 
     <name>wangjc-vip</name>
     <description>wangjc-vip</description>
@@ -45,7 +45,6 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <redisson.version>3.13.6</redisson.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.deploy.skip>true</maven.deploy.skip>
@@ -187,7 +186,7 @@
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson-spring-boot-starter</artifactId>
-            <version>${redisson.version}</version>
+            <version>3.13.6</version>
             <optional>true</optional>
         </dependency>
 
